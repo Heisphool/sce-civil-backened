@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCE Civil Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: #00eaff;
+            --secondary-glow: #ffc400;
+            --background-dark: #0a192f;
+            --background-light: #172a45;
+            --text-primary: #ccd6f6;
+            --text-secondary: #8892b0;
+            --border-color: rgba(0, 234, 255, 0.2);
+            --error-color: #ff4d4d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-image:
+                linear-gradient(to right, rgba(0, 234, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 234, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 4rem;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .landing-header { text-align: center; margin-bottom: 3rem; }
+        .landing-header .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+         .landing-header .logo .highlight {
+            color: var(--secondary-glow);
+            text-shadow: 0 0 15px var(--secondary-glow);
+        }
+
+        /* New Widget Section Styles */
+        .widget-section {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+
+        .widget-container {
+            background-color: var(--background-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-color);
+        }
+
+        .landing-widget {
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            transition: transform 0.2s ease;
+            width: 80px;
+        }
+
+        .landing-widget:hover {
+            transform: scale(1.1);
+        }
+
+        .widget-icon-wrapper {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background-color: var(--background-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--primary-glow);
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+        }
+
+        .widget-icon-wrapper .icon {
+            font-size: 2.2rem;
+            color: var(--primary-glow);
+        }
+
+        .widget-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+
+        .main-container { display: none; }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: var(--background-light);
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0, 234, 255, 0.1);
+            border: 1px solid var(--border-color);
+        }
+        header { text-align: center; margin-bottom: 2.5rem; }
+        header .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+        header .logo .highlight {
+            color: var(--secondary-glow);
+            text-shadow: 0 0 10px var(--secondary-glow);
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-link {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .tab-link:hover { color: var(--text-primary); }
+        .tab-link.active {
+            color: var(--primary-glow);
+            border-bottom-color: var(--primary-glow);
+        }
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .search-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            align-items: center;
+        }
+        #searchInput {
+            flex-grow: 1; padding: 0.8rem 1rem; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 4px;
+            background-color: #0a192f; color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        #searchInput:focus {
+            outline: none; border-color: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        #searchBtn {
+            padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold;
+            border: none; border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif; margin-left: 0.5rem;
+            color: var(--background-dark); background-color: var(--primary-glow);
+        }
+        #searchBtn:hover {
+            background-color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        #studentInfo {
+            background-color: var(--background-dark); border: 1px solid var(--border-color);
+            border-radius: 4px; min-height: 300px; padding: 2rem;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; transition: all 0.5s ease;
+        }
+        .info-card { width: 100%; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-card h2 {
+            font-family: 'Orbitron', sans-serif; font-size: 2rem;
+            color: var(--primary-glow); margin-bottom: 1rem;
+        }
+        .info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; text-align: left; margin-top: 2rem;
+        }
+        .info-item {
+            background: var(--background-light); padding: 1rem; border-radius: 4px;
+            border-left: 4px solid var(--secondary-glow);
+        }
+        .info-item .label {
+            font-size: 0.9rem; color: var(--text-secondary);
+            margin-bottom: 0.25rem; text-transform: uppercase;
+        }
+        .info-item .value { font-size: 1.2rem; font-weight: bold; color: var(--text-primary); }
+        .status-pass { color: #00ff7f; }
+        .status-fail { color: #ff4d4d; }
+        .ai-analysis-box {
+            margin-top: 2rem; padding: 1.5rem; background: var(--background-light);
+            border: 1px solid var(--border-color); border-radius: 4px; text-align: left;
+            border-left: 4px solid var(--primary-glow);
+        }
+        .ai-analysis-box .label {
+            font-family: 'Orbitron', sans-serif; color: var(--primary-glow);
+            margin-bottom: 0.5rem; display: block;
+        }
+        .ai-analysis-box .message { font-style: italic; color: var(--text-primary); }
+
+        .placeholder-text, .error-message { font-size: 1.2rem; color: var(--text-secondary); }
+        .results-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .result-card {
+            background-color: var(--background-dark); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; text-align: center;
+            display: flex; flex-direction: column; gap: 1rem; /* Added for spacing */
+        }
+        .result-card h3 {
+            font-family: 'Orbitron', sans-serif; color: var(--primary-glow);
+            margin-bottom: 0.5rem; /* Adjusted margin */
+        }
+        .result-card .reg-input {
+            width: 100%; padding: 0.75rem;
+            background-color: #0a192f; border: 1px solid var(--border-color);
+            border-radius: 4px; color: var(--text-primary); font-size: 1rem;
+        }
+        .result-card .btn-group { /* New group for buttons */
+             display: flex;
+             gap: 0.75rem;
+        }
+        .result-card .check-btn, .result-card .download-btn {
+            width: 100%; padding: 0.75rem; border: none; border-radius: 4px;
+            font-family: 'Orbitron', sans-serif; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .result-card .check-btn {
+             background-color: var(--primary-glow);
+             color: var(--background-dark);
+        }
+        .result-card .download-btn {
+             background-color: var(--secondary-glow);
+             color: var(--background-dark);
+        }
+        .result-card .check-btn:hover, .result-card .download-btn:hover { background-color: #fff; }
+
+        .result-card.disabled .check-btn, .result-card.disabled .download-btn {
+            background-color: var(--text-secondary); cursor: not-allowed;
+        }
+         /* Spinner for download button */
+        .spinner {
+            width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: var(--background-dark); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Generic Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(10, 25, 47, 0.8); backdrop-filter: blur(5px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .modal-content {
+            width: 100%; background-color: var(--background-light);
+            border: 1px solid var(--primary-glow); border-radius: 8px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 50px rgba(0, 234, 255, 0.2);
+        }
+        #result-modal .modal-content { height: 95%; }
+        #notification-modal .modal-content { max-width: 400px; padding: 2rem; text-align: center;}
+
+        .modal-header {
+            padding: 1rem; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 { font-family: 'Orbitron', sans-serif; color: var(--primary-glow); flex-grow: 1; }
+        .modal-header .material-icons { cursor: pointer; font-size: 2rem; margin-left: 1rem;}
+        #result-iframe { width: 100%; height: 100%; border: none; }
+
+        /* Notification Modal Specifics */
+         #notification-modal h3 { font-family: 'Orbitron'; font-size: 1.5rem; color: var(--text-primary); margin-bottom: 1rem;}
+         #notification-modal p { color: var(--text-secondary); margin-bottom: 2rem; }
+         .modal-buttons { display: flex; gap: 1rem; }
+         .modal-buttons button {
+            flex-grow: 1; padding: 0.8rem; border-radius: 5px; border: none;
+            font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s;
+         }
+         #notification-enable-btn { background-color: var(--primary-glow); color: var(--background-dark); }
+         #notification-later-btn { background-color: var(--text-secondary); color: var(--background-dark); }
+
+        footer {
+            text-align: center; margin-top: 3rem; padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color); font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        footer a { color: var(--primary-glow); text-decoration: none; font-weight: bold; }
+
+        /* Time Table Styles */
+        #timetable-container {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--background-dark);
+            border-radius: 8px;
+        }
+        #notification-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            background-color: var(--background-light);
+            padding: 0.75rem;
+            border-radius: 5px;
+            line-height: 1.5;
+        }
+        #day-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--primary-glow);
+            margin-bottom: 1.5rem;
+        }
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .class-item {
+            background-color: var(--background-light);
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid var(--secondary-glow);
+            text-align: left;
+        }
+        .class-item .time { font-weight: bold; color: var(--text-primary); }
+        .class-item .subject { font-size: 1.2rem; color: var(--primary-glow); }
+        .class-item .faculty { color: var(--text-secondary); }
+        #sunday-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary-glow);
+            padding: 3rem 1rem;
+        }
+        .motivational-quote {
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+        #quote-text { font-style: italic; font-size: 1.1rem; }
+        #new-quote-btn {
+             padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold;
+            border: none; border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--background-dark); background-color: var(--secondary-glow);
+        }
+        #new-quote-btn:hover { background-color: #fff; box-shadow: 0 0 15px var(--secondary-glow); }
+
+        /* AI ZONE STYLES */
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .ai-btn, .suggestion-btn {
+            padding: 0.8rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .ai-btn:hover, .ai-btn.selected, .suggestion-btn:hover {
+            background-color: var(--primary-glow);
+            color: var(--background-dark);
+        }
+        #ai-suggestions { display: none; margin-top: 1.5rem; }
+        #ai-suggestions p { margin-bottom: 1rem; text-align: center; color: var(--text-secondary); }
+        .suggestions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        .suggestion-btn { font-size: 0.9rem; padding: 0.5rem 1rem; }
+        #ai-zone-input-area {
+            display: flex; gap: 1rem; margin-top: 1.5rem;
+        }
+        #ai-zone-input {
+            flex-grow: 1; padding: 0.8rem 1rem; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 4px;
+            background-color: #0a192f; color: var(--text-primary);
+        }
+        #ai-zone-send {
+            padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold;
+            border: none; border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--background-dark); background-color: var(--primary-glow);
+        }
+        #ai-zone-output, #ai-vision-output {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            min-height: 100px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+
+        /* AI VISION STYLES */
+        #ai-vision-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        #image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #image-upload-area:hover {
+            background-color: var(--background-light);
+        }
+        #image-upload-area p { color: var(--text-secondary); }
+        #image-preview-container {
+            display: none;
+            text-align: center;
+        }
+        #image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        #ai-vision-prompt {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #0a192f;
+            color: var(--text-primary);
+            resize: vertical;
+        }
+        #ai-vision-submit {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem; font-weight: bold;
+            border: none; border-radius: 4px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--background-dark); background-color: var(--primary-glow);
+            width: 100%;
+        }
+
+
+        /* FLOATING CHAT STYLES */
+        #chat-toggle {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background-color: var(--primary-glow); color: var(--background-dark);
+            border-radius: 50%; border: none; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--primary-glow);
+            z-index: 999; transition: transform 0.3s ease;
+        }
+        #chat-toggle:hover { transform: scale(1.1); }
+        #chat-container {
+            position: fixed; bottom: 100px; right: 30px; width: 400px; max-width: 90vw;
+            height: 60vh; background-color: var(--background-dark); border: 1px solid var(--border-color);
+            border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: none;
+            flex-direction: column; overflow: hidden; z-index: 998;
+            transform: scale(0.5) translateY(100px); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease; transform-origin: bottom right;
+        }
+        #chat-container.visible {
+            display: flex;
+            transform: scale(1) translateY(0); opacity: 1;
+        }
+        .chat-header {
+            padding: 0.5rem 1rem; background-color: var(--background-light);
+            font-family: 'Orbitron', sans-serif; color: var(--primary-glow);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .chat-header .title { flex-grow: 1; }
+        .chat-header .header-btn {
+            background: none; border: none; color: var(--primary-glow);
+            cursor: pointer; padding: 0.5rem;
+        }
+        .chat-messages {
+            flex-grow: 1; padding: 1rem; overflow-y: auto; display: flex;
+            flex-direction: column; gap: 1rem;
+        }
+        .chat-message {
+            padding: 0.75rem 1rem; border-radius: 8px; max-width: 80%; line-height: 1.5;
+        }
+        .user-message {
+            background-color: var(--primary-glow); color: var(--background-dark);
+            align-self: flex-end; border-bottom-right-radius: 0;
+        }
+        .ai-message {
+            background-color: var(--background-light); color: var(--text-primary);
+            align-self: flex-start; border-bottom-left-radius: 0;
+        }
+        .chat-input-area { display: flex; padding: 1rem; border-top: 1px solid var(--border-color); }
+        #chat-input {
+            flex-grow: 1; background-color: var(--background-light);
+            border: 1px solid var(--border-color); border-radius: 5px;
+            color: var(--text-primary); padding: 0.75rem;
+            font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+        }
+        #chat-input:focus { outline: none; border-color: var(--primary-glow); }
+        #chat-send {
+            background: none; border: none; color: var(--primary-glow);
+            font-size: 2rem; cursor: pointer; margin-left: 0.5rem;
+            transition: transform 0.2s;
+        }
+        #chat-send:hover { transform: scale(1.2); }
+
+    </style>
+</head>
+<body>
+
+<div class="landing-page" id="landing-page">
+    <header class="landing-header">
+        <div class="logo">SCE <span class="highlight">Civil</span> Hub</div>
+    </header>
+
+    <div class="widget-section">
+        <h2 class="section-title">Academics &amp; Results</h2>
+        <div class="widget-container">
+            <div class="landing-widget" data-target-tab="results">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">assessment</span></div>
+                <p class="widget-label">Results</p>
+            </div>
+            <div class="landing-widget" data-target-tab="data">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">storage</span></div>
+                <p class="widget-label">Student Data</p>
+            </div>
+            <div class="landing-widget" data-target-tab="timetable">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">schedule</span></div>
+                <p class="widget-label">Timetable</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="widget-section">
+        <h2 class="section-title">AI Tools</h2>
+        <div class="widget-container">
+            <div class="landing-widget" data-target-tab="ai-zone">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">psychology_alt</span></div>
+                <p class="widget-label">Subject AI</p>
+            </div>
+            <div class="landing-widget" data-target-tab="ai-vision">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">camera_alt</span></div>
+                <p class="widget-label">AI Vision</p>
+            </div>
+            <div class="landing-widget" id="general-ai-widget">
+                <div class="widget-icon-wrapper"><span class="material-icons icon">support_agent</span></div>
+                <p class="widget-label">General AI</p>
+            </div>
+        </div>
+    </div>
+
+    <footer style="position: absolute; bottom: 1rem; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+        Portal designed & developed by <a href="#" style="color: var(--primary-glow); text-decoration: none; font-weight: bold;">Phool Babu</a>
+    </footer>
+</div>
+
+<div class="main-container" id="main-container">
+    <div class="container">
+        <header>
+            <div class="logo">SCE <span class="highlight">Civil</span> Data Matrix</div>
+        </header>
+        <nav class="tabs">
+            <div class="tab-link" data-tab="results">Result 2k23 Batch</div>
+            <div class="tab-link" data-tab="data">SCE Civil Data</div>
+            <div class="tab-link" data-tab="timetable">Class Timetable</div>
+            <div class="tab-link" data-tab="ai-zone">Subject AI Zone</div>
+            <div class="tab-link" data-tab="ai-vision">AI Vision</div>
+        </nav>
+        <main>
+            <div id="results" class="tab-content">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+                    Enter your registration number below to check the official university result directly or download the PDF.
+                </p>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>1st Semester Result</h3>
+                        <input type="text" class="reg-input" id="reg-input-1" placeholder="Enter Reg. Number">
+                        <div class="btn-group">
+                             <button class="check-btn" data-url="https://results.beup.ac.in/ResultsBTech1stSem2023_B2023Pub.aspx" data-sem-name="I" data-input-id="reg-input-1">View</button>
+                             <button class="download-btn" data-sem="1" data-input-id="reg-input-1">Download PDF</button>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <h3>2nd Semester Result</h3>
+                        <input type="text" class="reg-input" id="reg-input-2" placeholder="Enter Reg. Number">
+                        <div class="btn-group">
+                            <button class="check-btn" data-url="https://results.beup.ac.in/ResultsBTech2ndSem2024_B2023Pub.aspx" data-sem-name="II" data-input-id="reg-input-2">View</button>
+                            <button class="download-btn" data-sem="2" data-input-id="reg-input-2">Download PDF</button>
+                        </div>
+                    </div>
+                    <div class="result-card" id="third-sem-card">
+                        <h3>3rd Semester Result</h3>
+                        <input type="text" class="reg-input" id="reg-input-3" placeholder="Enter Reg. Number">
+                        <div class="btn-group">
+                            <button class="check-btn" data-url="https://results.beup.ac.in/ResultsBTech3rdSem2024_B2023Pub.aspx" data-sem-name="III" data-input-id="reg-input-3">View</button>
+                            <button class="download-btn" data-sem="3" data-input-id="reg-input-3">Download PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="data" class="tab-content">
+                <div class="search-section">
+                    <input type="text" id="searchInput" placeholder="Search 1st/2nd Sem Data by Reg No or Name...">
+                    <button id="searchBtn">Find Result</button>
+                </div>
+                <section id="studentInfo">
+                    <div class="placeholder-text">
+                        Search for a student's archived result.
+                    </div>
+                </section>
+            </div>
+
+            <div id="timetable" class="tab-content">
+                <div id="timetable-container">
+                    <div id="notification-info">
+                        <span class="material-icons" style="vertical-align: middle; font-size: 1.2rem; margin-right: 0.5rem;">notifications_active</span>
+                        Class notifications are active. For reliable alerts on your phone, please grant notification permission and keep this app running in the background.
+                    </div>
+                    <h2 id="day-title">Today's Schedule</h2>
+                    <div id="schedule-display">
+                        <!-- Timetable will be injected here by JS -->
+                    </div>
+                    <div class="motivational-quote">
+                        <p id="quote-text">Loading a motivational quote for you...</p>
+                    </div>
+                    <button id="new-quote-btn">New Quote</button>
+                </div>
+            </div>
+
+            <div id="ai-zone" class="tab-content">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Select a subject to ask a question.
+                </p>
+                <div class="ai-grid">
+                    <button class="ai-btn" data-subject="Engineering Geology (Eng Geo)">Eng Geo</button>
+                    <button class="ai-btn" data-subject="Materials, Testing & Evaluation (MTE)">MTE</button>
+                    <button class="ai-btn" data-subject="Introduction to Solid Mechanics (ISM)">ISM</button>
+                    <button class="ai-btn" data-subject="Introduction to Fluid Mechanics (IFM)">IFM</button>
+                    <button class="ai-btn" data-subject="Structural Analysis (SA)">SA</button>
+                    <button class="ai-btn" data-subject="Civil Engineering - Societal & Global Impact (SGI)">SGI</button>
+                    <button class="ai-btn" data-subject="Mechanical Engineering (ME)">ME</button>
+                    <button class="ai-btn" data-subject="Management (Organizational Behaviour)">Management</button>
+                </div>
+                <div id="ai-suggestions">
+                    <p>Or try one of these suggestions:</p>
+                    <div class="suggestions-grid" id="suggestions-grid">
+                        <!-- Suggestion buttons will be injected here -->
+                    </div>
+                </div>
+                <div id="ai-zone-input-area" style="display: none;">
+                    <input type="text" id="ai-zone-input" placeholder="Ask a question about the selected subject...">
+                    <button id="ai-zone-send">Ask AI</button>
+                </div>
+                <div id="ai-zone-output">Select a subject to start.</div>
+            </div>
+
+            <div id="ai-vision" class="tab-content">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Upload an image of a bridge, building, crack in a wall, or any civil engineering-related problem to get an AI analysis.
+                </p>
+                <div id="ai-vision-container">
+                    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+                    <div id="image-upload-area">
+                        <span class="material-icons" style="font-size: 3rem; color: var(--text-secondary);">upload_file</span>
+                        <p>Click here to upload an image</p>
+                    </div>
+                    <div id="image-preview-container">
+                        <img id="image-preview" src="#" alt="Image Preview">
+                    </div>
+                    <textarea id="ai-vision-prompt" rows="3" placeholder="Ask a question about the image (e.g., 'What type of bridge is this?', 'Is this crack serious?', 'Identify potential failure points.')"></textarea>
+                    <button id="ai-vision-submit">Analyze Image</button>
+                    <div id="ai-vision-output">Analysis will appear here...</div>
+                </div>
+            </div>
+
+        </main>
+        <footer>
+            Portal designed & developed by <a href="#">Phool Babu</a>
+        </footer>
+    </div>
+</div>
+
+<button id="chat-toggle"><span class="material-icons">support_agent</span></button>
+<div id="chat-container">
+    <div class="chat-header">
+        <span class="title">General AI Assistant</span>
+        <button id="new-chat-btn" class="header-btn" title="New Chat"><span class="material-icons">add_comment</span></button>
+        <button id="chat-close" class="header-btn" title="Close"><span class="material-icons">close</span></button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+        <div class="chat-message ai-message">
+            Hello! Ask me anything about civil engineering, or any other topic.
+        </div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Ask anything...">
+        <button id="chat-send" class="material-icons">send</button>
+    </div>
+</div>
+
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Official University Result</h3>
+            <div>
+                <span class="material-icons" id="modal-close-btn" title="Close">close</span>
+            </div>
+        </div>
+        <iframe id="result-iframe" src=""></iframe>
+    </div>
+</div>
+
+<div id="notification-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Enable Class Notifications?</h3>
+        <p>Allow notifications to receive timely alerts for your upcoming classes, even when the app is in the background.</p>
+        <div class="modal-buttons">
+            <button id="notification-later-btn">Maybe Later</button>
+            <button id="notification-enable-btn">Enable</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- START OF NEW CODE FOR PDF DOWNLOAD ---
+
+    // *** YAHAN APNA NAYA RENDER URL DAALEIN ***
+    const BACKEND_URL = 'https://sce-civil-backend.onrender.com'; // Example URL
+
+    async function handlePdfDownload(event) {
+        const btn = event.currentTarget;
+        const originalContent = btn.innerHTML;
+        const regInput = document.getElementById(btn.dataset.inputId);
+        const regNo = regInput.value.trim();
+        const semester = btn.dataset.sem;
+
+        if (!regNo || isNaN(regNo)) {
+            alert('Please enter a valid Registration Number.');
+            return;
+        }
+
+        // Show loading state
+        btn.innerHTML = '<div class="spinner"></div><span>Downloading...</span>';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/download-result`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reg_no: regNo, semester: semester })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to download PDF.');
+            }
+
+            // Create a blob from the PDF stream
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            // Create a temporary link to trigger the download
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `BEUP_Result_Sem${semester}_${regNo}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+        } catch (error) {
+            console.error('Download Error:', error);
+            alert(`Could not download PDF: ${error.message}\n\nMake sure the backend server (app.py) is running.`);
+        } finally {
+            // Restore button state
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    }
+    // --- END OF NEW CODE FOR PDF DOWNLOAD ---
+
+
+    // IMPORTANT: REPLACE with your actual Gemini API Key
+    const API_KEY = "AIzaSyDxm6GJK9HlLhx8zRF69zrIviCP26BepsE";
+
+    const studentData = { "23101132001": { name: "UDAY KUMAR", secondSem: "3.61", cgpa: "4.29", yearBack: "Yes" }, "23101132002": { name: "MANISH KUMAR", secondSem: "7.22", cgpa: "7.32", yearBack: "No" }, "23101132003": { name: "AMRIT RAJ", secondSem: "6.95", cgpa: "7.22", yearBack: "No" }, "23101132004": { name: "MOHAMMAD ASHRAF", secondSem: "7.56", cgpa: "7.39", yearBack: "No" }, "23101132005": { name: "MD FAIJUL HAQUE", secondSem: "7.44", cgpa: "7.2", yearBack: "No" }, "23101132006": { name: "INDRAJEET KUMAR", secondSem: "6.56", cgpa: "6.59", yearBack: "No" }, "23101132007": { name: "ASHUTOSH KUMAR", secondSem: "7.73", cgpa: "7.78", yearBack: "No" }, "23101132008": { name: "HIMANSHU KUMAR", secondSem: "7.61", cgpa: "7.74", yearBack: "No" }, "23101132009": { name: "NIKHIL KUMAR", secondSem: "6.88", cgpa: "6.11", yearBack: "No" }, "23101132010": { name: "SONU KUMAR", secondSem: "8.07", cgpa: "8.36", yearBack: "No" }, "23101132011": { name: "RAJ LAXMI KUMARI", secondSem: "7.98", cgpa: "8.02", yearBack: "No" }, "23101132012": { name: "Dolly Kumari", secondSem: "6.37", cgpa: "6.28", yearBack: "No" }, "23101132014": { name: "Jyoti Kumari", secondSem: "6.83", cgpa: "6.92", yearBack: "No" }, "23101132015": { name: "Priyaranjan Kumar", secondSem: "7.15", cgpa: "6.67", yearBack: "No" }, "23101132016": { name: "Nikki Kumari", secondSem: "6.66", cgpa: "6.67", yearBack: "No" }, "23101132017": { name: "Prachi Priyam", secondSem: "7", cgpa: "6.59", yearBack: "No" }, "23101132018": { name: "Md Tousif Ansari", secondSem: "6.9", cgpa: "6.14", yearBack: "No" }, "23101132019": { name: "Yash Raj", secondSem: "7.39", cgpa: "7.46", yearBack: "No" }, "23101132020": { name: "Rajiv Kumar", secondSem: "5.42", cgpa: "6.18", yearBack: "No" }, "23101132021": { name: "Indrajit Kumar Das", secondSem: "5.1", cgpa: "5.67", yearBack: "No" }, "23101132022": { name: "Pankaj Kumar", secondSem: "7.59", cgpa: "7.14", yearBack: "No" }, "23101132024": { name: "Satyajeet Kumar", secondSem: "7.2", cgpa: "7.17", yearBack: "No" }, "23101132025": { name: "Phool Kumar Mahto", secondSem: "8.49", cgpa: "8.45", yearBack: "No" }, "23101132027": { name: "Azad Kumar", secondSem: "6.76", cgpa: "7.01", yearBack: "No" }, "23101132028": { name: "Anupam Kumari", secondSem: "4.51", cgpa: "5.38", yearBack: "No" }, "23101132030": { name: "Aditya Raj", secondSem: "6.46", cgpa: "5.67", yearBack: "No" }, "23101132031": { name: "Kajal Kumari", secondSem: "3.81", cgpa: "3.68", yearBack: "Yes" }, "23101132032": { name: "Mahanand Kumar", secondSem: "8.37", cgpa: "8.54", yearBack: "No" }, "23101132033": { name: "Ayush Raj", secondSem: "7.95", cgpa: "7.71", yearBack: "No" }, "23101132034": { name: "Md Ashir Hussain", secondSem: "4.02", cgpa: "4.96", yearBack: "Yes" }, "23101132035": { name: "Afsar Khan", secondSem: "7.37", cgpa: "7.47", yearBack: "No" }, "23101132036": { name: "Gaurav Kumar", secondSem: "6.42", cgpa: "6.49", yearBack: "No" }, "23101132037": { name: "Suraj Kumar Verma", secondSem: "6.95", cgpa: "7.09", yearBack: "No" }, "23101132039": { name: "Astha Kumari", secondSem: "6.73", cgpa: "4.76", yearBack: "Yes" }, "23101132041": { name: "Muskan Kumari", secondSem: "6.85", cgpa: "6.83", yearBack: "No" }, "23101132042": { name: "Nitish Kumar", secondSem: "8.39", cgpa: "8.61", yearBack: "No" }, "23101132043": { name: "Sudhir Kumar", secondSem: "7.93", cgpa: "8.2", yearBack: "No" }, "23101132044": { name: "Prem Kumar Ranjan", secondSem: "6.76", cgpa: "6.2", yearBack: "No" } };
+    const timeTableData = {
+        monday: [ { time: '10:00 - 10:50', subject: 'ENG GEO', faculty: 'MTK', room: '201' }, { time: '10:50 - 11:40', subject: 'SGI', faculty: 'MDH', room: '201' }, { time: '11:40 - 12:30', subject: 'ISM', faculty: 'MTK', room: '201' }, { time: '12:30 - 13:20', subject: 'SA', faculty: 'SRS', room: '201' }, { time: '15:00 - 15:50', subject: 'ENG GEO LAB (GROUP-A)', faculty: 'MTK', room: '011' }, { time: '15:50 - 16:40', subject: 'IFM LAB (GROUP-B)', faculty: 'PKS', room: '012' }, ],
+        tuesday: [ { time: '10:00 - 10:50', subject: 'DPP', faculty: 'MTK', room: '201' }, { time: '10:50 - 11:40', subject: 'MTE', faculty: 'SRS', room: '201' }, { time: '11:40 - 12:30', subject: 'ISM', faculty: 'MTK', room: '201' }, { time: '12:30 - 13:20', subject: 'IFM', faculty: 'PKS', room: '201' }, { time: '14:10 - 15:50', subject: 'OE-I (MOOC)', faculty: 'Online', room: 'Online' }, ],
+        wednesday: [ { time: '10:00 - 10:50', subject: 'ENG GEO', faculty: 'MTK', room: '201' }, { time: '10:50 - 11:40', subject: 'SA', faculty: 'SRS', room: '201' }, { time: '11:40 - 12:30', subject: 'IFM', faculty: 'PKS', room: '201' }, { time: '15:00 - 16:40', subject: 'Mang-I(OB)', faculty: 'Online', room: 'Online' }, ],
+        thursday: [ { time: '10:00 - 10:50', subject: 'ME', faculty: 'KK', room: '201' }, { time: '10:50 - 11:40', subject: 'DPP', faculty: 'MDH', room: '201' }, { time: '11:40 - 12:30', subject: 'IFM', faculty: 'PKS', room: '201' }, { time: '12:30 - 13:20', subject: 'SA', faculty: 'SRS', room: '201' }, ],
+        friday: [ { time: '10:00 - 10:50', subject: 'MTE', faculty: 'SRS', room: '201' }, { time: '10:50 - 11:40', subject: 'ME', faculty: 'KK', room: '201' }, { time: '14:10 - 15:50', subject: 'Mang-I(OB)', faculty: 'Online', room: 'Online' }, { time: '15:00 - 15:50', subject: 'IFM LAB (GROUP-A)', faculty: 'PKS', room: '012' }, { time: '15:50 - 16:40', subject: 'MTE LAB (GROUP-B)', faculty: 'SRS', room: '008' }, ],
+        saturday: [ { time: '10:00 - 10:50', subject: 'ME', faculty: 'KK', room: '201' }, { time: '10:50 - 11:40', subject: 'SGI', faculty: 'MDH', room: '201' }, { time: '11:40 - 12:30', subject: 'ISM', faculty: 'MTK', room: '201' }, { time: '12:30 - 13:20', subject: 'SA', faculty: 'SRS', room: '201' }, { time: '15:00 - 15:50', subject: 'ENG GEO LAB (GROUP-B)', faculty: 'MTK', room: '011' }, { time: '15:50 - 16:40', subject: 'MTE LAB (GROUP-A)', faculty: 'SRS', room: '008' }, ],
+        sunday: [],
+    };
+    const motivationalQuotes = [ "The best way to predict the future is to create it.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "Believe you can and you're halfway there.", "Strive for progress, not perfection.", "The expert in anything was once a beginner.", "The secret of getting ahead is getting started.", "Don’t watch the clock; do what it does. Keep going.", "The harder you work for something, the greater you'll feel when you achieve it." ];
+    const aiSubjectSuggestions = {
+        "Engineering Geology (Eng Geo)": ["What is soil liquefaction?", "Explain different types of faults.", "What are seismic waves?"],
+        "Materials, Testing & Evaluation (MTE)": ["Define 'compressive strength'.", "What is the slump test for?", "Difference between cement & concrete?"],
+        "Introduction to Solid Mechanics (ISM)": ["Explain stress-strain curve.", "What is Hooke's Law?", "Define 'moment of inertia'."],
+        "Introduction to Fluid Mechanics (IFM)": ["What is Bernoulli's principle?", "Define viscosity.", "Laminar vs. turbulent flow?"],
+        "Structural Analysis (SA)": ["What is a cantilever beam?", "Explain degrees of freedom.", "Define 'shear force'."],
+        "Civil Engineering - Societal & Global Impact (SGI)": ["Impact of dams on environment?", "What is sustainable construction?", "Role of a civil engineer in society?"],
+        "Mechanical Engineering (ME)": ["Explain the first law of thermodynamics.", "What is a heat engine?", "Define 'torque'."],
+        "Management (Organizational Behaviour)": ["What is Maslow's hierarchy?", "Explain Theory X and Theory Y.", "What is leadership?"]
+    };
+
+    let currentAiSubject = null;
+    let isModalOpen = false;
+    let isChatOpen = false;
+    let uploadedImageBase64 = null;
+    let sentNotificationsToday = [];
+
+    // --- Page State and History Management ---
+    const elements = {};
+
+    function showPage(pageName, tabId) {
+        elements.landingPage.style.display = pageName === 'landing' ? 'flex' : 'none';
+        elements.mainContainer.style.display = pageName === 'main' ? 'block' : 'none';
+        if (pageName === 'main') {
+            activateTab(tabId);
+        }
+    }
+
+    function toggleChat(visible) {
+        elements.chatContainer.classList.toggle('visible', visible);
+        isChatOpen = visible;
+    }
+
+    function toggleModal(modalId, visible, options = {}) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.style.display = visible ? 'flex' : 'none';
+
+        if (modalId === 'result-modal') {
+             isModalOpen = visible;
+             if(visible) {
+                elements.modalTitle.textContent = options.title;
+                elements.resultIframe.src = options.url;
+             } else {
+                elements.resultIframe.src = '';
+             }
+        }
+    }
+
+    function renderState(state) {
+        state = state || { page: 'landing' }; // Default state
+        showPage(state.page, state.tab);
+        toggleChat(state.chat || false);
+        toggleModal('result-modal', state.modal || false, { url: state.modalUrl, title: state.modalTitle });
+    }
+
+    function navigate(newState) {
+        const fullState = { ...history.state, ...newState };
+        // Prevent pushing the same state consecutively
+        if (JSON.stringify(history.state) !== JSON.stringify(fullState)) {
+             history.pushState(fullState, '', `#${fullState.page || 'home'}`);
+        }
+        renderState(fullState);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cache all elements
+        elements.landingPage = document.getElementById('landing-page');
+        elements.mainContainer = document.getElementById('main-container');
+        elements.chatContainer = document.getElementById('chat-container');
+        elements.resultModal = document.getElementById('result-modal');
+        elements.modalTitle = document.getElementById('modal-title');
+        elements.resultIframe = document.getElementById('result-iframe');
+        elements.notificationModal = document.getElementById('notification-modal');
+
+        // --- Notification Setup ---
+        scheduleClassNotifications();
+
+        // --- History and Back Button Handling ---
+        window.addEventListener('popstate', (event) => renderState(event.state));
+        history.replaceState({ page: 'landing' }, 'Home', '#home');
+        renderState({ page: 'landing' });
+
+        // --- Event Listeners ---
+        document.querySelectorAll('.landing-widget').forEach(widget => {
+            const targetTab = widget.dataset.targetTab;
+            if (targetTab) {
+                widget.addEventListener('click', () => {
+                    navigate({ page: 'main', tab: targetTab });
+                });
+            }
+        });
+
+        document.getElementById('general-ai-widget').addEventListener('click', () => navigate({ ...history.state, chat: true }));
+        document.getElementById('chat-toggle').addEventListener('click', () => {
+            if (isChatOpen) history.back();
+            else navigate({ ...history.state, chat: true });
+        });
+        document.getElementById('chat-close').addEventListener('click', () => history.back());
+        document.getElementById('modal-close-btn').addEventListener('click', () => history.back());
+
+        document.querySelectorAll('.tab-link').forEach(tab => tab.addEventListener('click', () => navigate({ page: 'main', tab: tab.dataset.tab })));
+
+        document.querySelectorAll('.check-btn').forEach(btn => {
+            if(!btn.disabled) {
+                btn.addEventListener('click', (event) => {
+                    const btnEl = event.currentTarget;
+                    const regInput = document.getElementById(btnEl.dataset.inputId);
+                    const regNo = regInput.value.trim();
+                    if (!regNo || isNaN(regNo)) { alert('Please enter a valid Registration Number.'); return; }
+                    const finalUrl = `${btnEl.dataset.url}?Sem=${btnEl.dataset.semName}&RegNo=${regNo}`;
+                    navigate({ ...history.state, modal: true, modalUrl: finalUrl, modalTitle: `Official Result for ${regNo}` });
+                });
+            }
+        });
+
+        // Add event listeners for new download buttons
+        document.querySelectorAll('.download-btn').forEach(btn => {
+            btn.addEventListener('click', handlePdfDownload);
+        });
+
+
+        // Notification Modal Buttons
+        document.getElementById('notification-enable-btn').addEventListener('click', handleNotificationPermissionRequest);
+        document.getElementById('notification-later-btn').addEventListener('click', () => {
+            toggleModal('notification-modal', false);
+        });
+
+        document.getElementById('searchBtn').addEventListener('click', handleArchivedSearch);
+        document.getElementById('searchInput').addEventListener('keypress', (e) => e.key === 'Enter' && handleArchivedSearch());
+        document.getElementById('new-quote-btn').addEventListener('click', displayNewQuote);
+        document.getElementById('new-chat-btn').addEventListener('click', startNewChat);
+        document.getElementById('chat-send').addEventListener('click', handleGeneralAiChat);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleGeneralAiChat(); });
+        document.querySelectorAll('#ai-zone .ai-btn').forEach(btn => btn.addEventListener('click', () => selectAiSubject(btn)));
+        document.getElementById('ai-zone-send').addEventListener('click', handleSubjectAiRequest);
+        document.getElementById('ai-zone-input').addEventListener('keypress', (e) => e.key === 'Enter' && handleSubjectAiRequest());
+        document.getElementById('image-upload-area').addEventListener('click', () => document.getElementById('image-upload-input').click());
+        document.getElementById('image-upload-input').addEventListener('change', handleImageUpload);
+        document.getElementById('ai-vision-submit').addEventListener('click', handleAiVisionRequest);
+    });
+
+    function activateTab(tabId) {
+        if (!tabId) return;
+
+        // Handle notification permission for timetable
+        if (tabId === 'timetable') {
+            checkAndPromptForNotificationPermission();
+        }
+
+        document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const activeTabLink = document.querySelector(`.tab-link[data-tab="${tabId}"]`);
+        const activeContent = document.getElementById(tabId);
+        if (activeTabLink) activeTabLink.classList.add('active');
+        if (activeContent) activeContent.classList.add('active');
+        if (tabId === 'timetable') displayTimeTable();
+    }
+
+    async function handleArchivedSearch() {
+        const studentInfoDiv = document.getElementById('studentInfo');
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) {
+            studentInfoDiv.innerHTML = `<div class="placeholder-text">Please enter a registration number or name.</div>`;
+            return;
+        }
+        let foundStudentReg = null;
+        if (studentData[query]) {
+            foundStudentReg = query;
+        } else {
+            foundStudentReg = Object.keys(studentData).find(reg => studentData[reg].name.toLowerCase().includes(query.toLowerCase()));
+        }
+        if (foundStudentReg) {
+            displayStudentInfo(foundStudentReg);
+        } else {
+            studentInfoDiv.innerHTML = `<div class="error-message">No student found for query: "${query}".</div>`;
+        }
+    }
+
+    async function displayStudentInfo(regNumber) {
+        const studentInfoDiv = document.getElementById('studentInfo');
+        studentInfoDiv.innerHTML = `<div class="placeholder-text">Fetching data and generating AI analysis...</div>`;
+        const student = studentData[regNumber];
+        const statusClass = student.yearBack.toLowerCase() === 'no' ? 'status-pass' : 'status-fail';
+        const statusText = student.yearBack.toLowerCase() === 'no' ? 'Cleared' : 'Year Back';
+
+        const aiAnalysisPromise = getAiAnalysis(student);
+
+        const infoHTML = `
+            <div class="info-card">
+                <h2>${student.name}</h2>
+                <div class="info-grid">
+                    <div class="info-item"><div class="label">Reg. No.</div><div class="value">${regNumber}</div></div>
+                    <div class="info-item"><div class="label">Current CGPA</div><div class="value">${student.cgpa}</div></div>
+                    <div class="info-item"><div class="label">2nd Sem SGPA</div><div class="value">${student.secondSem}</div></div>
+                    <div class="info-item"><div class="label">Status</div><div class="value ${statusClass}">${statusText}</div></div>
+                </div>
+                <div class="ai-analysis-box">
+                    <span class="label">AI Performance Analysis:</span>
+                    <p class="message" id="ai-analysis-text">Generating...</p>
+                </div>
+            </div>`;
+        studentInfoDiv.innerHTML = infoHTML;
+
+        const aiAnalysisText = await aiAnalysisPromise;
+        document.getElementById('ai-analysis-text').textContent = aiAnalysisText;
+    }
+
+    function displayTimeTable() {
+        const scheduleDisplay = document.getElementById('schedule-display');
+        const dayTitle = document.getElementById('day-title');
+        const dayIndex = new Date().getDay();
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const today = days[dayIndex];
+        dayTitle.textContent = `${today.charAt(0).toUpperCase() + today.slice(1)}'s Schedule`;
+        const schedule = timeTableData[today];
+        if (today === 'sunday') {
+            scheduleDisplay.innerHTML = `<div id="sunday-message">Praveen Sir hote to Aaj bhi class hota 😜</div>`;
+        } else if (schedule && schedule.length > 0) {
+            scheduleDisplay.innerHTML = '<div class="timetable-grid">' + schedule.map(item => `<div class="class-item"><div class="time">${item.time}</div><div class="subject">${item.subject}</div><div class="faculty">Faculty: ${item.faculty} | Room: ${item.room}</div></div>`).join('') + '</div>';
+        } else {
+            scheduleDisplay.innerHTML = `<p class="placeholder-text">No classes scheduled for today.</p>`;
+        }
+        displayNewQuote();
+    }
+
+    function displayNewQuote() {
+       const quoteText = document.getElementById('quote-text');
+       const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+       quoteText.textContent = `"${motivationalQuotes[randomIndex]}"`;
+    }
+
+    // --- Notification Functions ---
+    function checkAndPromptForNotificationPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            toggleModal('notification-modal', true);
+        }
+    }
+
+    function handleNotificationPermissionRequest() {
+        toggleModal('notification-modal', false);
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification("Notifications Enabled!", {
+                    body: "You will now receive alerts for your classes.",
+                    icon: "https://placehold.co/192x192/0a192f/00eaff?text=SCE"
+                });
+            }
+        });
+    }
+
+
+    function scheduleClassNotifications() {
+        // Run it once on load to catch up
+        setTimeout(checkAndNotify, 2000);
+        // Then check every minute
+        setInterval(checkAndNotify, 60000);
+    }
+
+    function checkAndNotify() {
+        const now = new Date();
+        const dayIndex = now.getDay();
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const today = days[dayIndex];
+
+        if (now.getHours() === 0 && now.getMinutes() === 0) {
+            sentNotificationsToday = [];
+        }
+
+        const schedule = timeTableData[today];
+        if (!schedule || schedule.length === 0 || !('Notification' in window) || Notification.permission !== 'granted') {
+            return;
+        }
+
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        schedule.forEach(classItem => {
+            const timeParts = classItem.time.split(' - ')[0].trim().split(':');
+            const classHour = parseInt(timeParts[0]);
+            const classMinute = parseInt(timeParts[1]);
+
+            if (classHour === currentHour && classMinute === currentMinute && !sentNotificationsToday.includes(classItem.time)) {
+                const title = `Class Alert: ${classItem.subject}`;
+                const body = `Your class is starting now.\nTime: ${classItem.time}\nRoom No: ${classItem.room}`;
+
+                new Notification(title, {
+                    body: body,
+                    icon: "https://placehold.co/192x192/0a192f/00eaff?text=SCE",
+                    tag: `class-${classHour}-${classMinute}` // Prevents duplicate notifications
+                });
+                sentNotificationsToday.push(classItem.time);
+            }
+        });
+    }
+
+
+    // --- AI Functions ---
+    async function callGemini(prompt, imageBase64 = null) {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+
+        let parts = [{ "text": prompt }];
+        if (imageBase64) {
+            parts.push({
+                "inline_data": {
+                    "mime_type": "image/jpeg",
+                    "data": imageBase64
+                }
+            });
+        }
+
+        const requestBody = { "contents": [{ "parts": parts }] };
+
+        try {
+            const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text.trim() || "Sorry, I couldn't generate a response.";
+        } catch (error) {
+            console.error('Error calling Gemini:', error);
+            return "Could not generate a response. Check API key and network.";
+        }
+    }
+
+    async function getAiAnalysis(student) {
+        const cgpa = parseFloat(student.cgpa);
+        let prompt;
+        if (student.yearBack.toLowerCase() === 'yes') {
+            prompt = `Write a very supportive and uplifting message for a civil engineering student named ${student.name} who is facing a year back. Motivate them to see this as a chance to build a stronger foundation and come back more determined. Mention their CGPA is ${cgpa}.`;
+        } else if (cgpa >= 8.0) {
+            prompt = `Write a short, encouraging, and congratulatory message for a civil engineering student named ${student.name} who has an excellent CGPA of ${cgpa}. Mention their bright future in the field.`;
+        } else if (cgpa >= 6.5) {
+            prompt = `Write a short, motivational message for a civil engineering student named ${student.name} with a good CGPA of ${cgpa}. Encourage them to keep up the hard work and aim higher.`;
+        } else {
+            prompt = `Write a supportive and encouraging message for a civil engineering student named ${student.name} with a CGPA of ${cgpa}. Advise them to focus on key subjects and not lose hope, as practical skills are also important.`;
+        }
+        return await callGemini(prompt);
+    }
+
+    function selectAiSubject(btn) {
+        currentAiSubject = btn.dataset.subject;
+        document.getElementById('ai-zone-output').textContent = `Selected subject: ${currentAiSubject}. Ask your question below or try a suggestion.`;
+        document.getElementById('ai-zone-input-area').style.display = 'flex';
+        document.getElementById('ai-zone-input').focus();
+        document.querySelectorAll('#ai-zone .ai-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        const suggestionsContainer = document.getElementById('suggestions-grid');
+        const suggestions = aiSubjectSuggestions[currentAiSubject] || [];
+        suggestionsContainer.innerHTML = suggestions.map(q => `<button class="suggestion-btn">${q}</button>`).join('');
+        document.getElementById('ai-suggestions').style.display = 'block';
+        document.querySelectorAll('.suggestion-btn').forEach(sBtn => {
+            sBtn.addEventListener('click', () => {
+                document.getElementById('ai-zone-input').value = sBtn.textContent;
+                handleSubjectAiRequest();
+            });
+        });
+    }
+
+    async function handleSubjectAiRequest() {
+        const userInput = document.getElementById('ai-zone-input').value.trim();
+        const outputDiv = document.getElementById('ai-zone-output');
+        if (!currentAiSubject || !userInput) {
+            outputDiv.textContent = "Please select a subject and enter a question.";
+            return;
+        }
+        outputDiv.textContent = 'Generating AI response...';
+        const prompt = `As a civil engineering expert, explain the following concept related to "${currentAiSubject}":\n\nQuestion: "${userInput}"\n\nProvide a clear, concise answer for a university student.`;
+        outputDiv.textContent = await callGemini(prompt);
+    }
+
+    function startNewChat() {
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.innerHTML = '';
+        addChatMessage("Hello! Ask me anything about civil engineering, or any other topic.", 'ai');
+    }
+
+    async function handleGeneralAiChat() {
+        const chatInput = document.getElementById('chat-input');
+        const userInput = chatInput.value.trim();
+        if (!userInput) return;
+
+        addChatMessage(userInput, 'user');
+        chatInput.value = '';
+        const thinkingMessage = addChatMessage("Thinking...", 'ai');
+
+        const creatorPrompt = `You are a helpful AI assistant integrated into the 'SCE Civil Hub' portal. Your creator, designer, and developer is a talented student named Phool Babu. If asked who made you, created you, or anything similar, you must proudly and clearly state that Phool Babu created you. Now, please answer the user's question: "${userInput}"`;
+        const response = await callGemini(creatorPrompt);
+
+        thinkingMessage.textContent = response;
+        document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+    }
+
+    function addChatMessage(message, sender) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageEl = document.createElement('div');
+        messageEl.classList.add('chat-message', `${sender}-message`);
+        messageEl.textContent = message;
+        chatMessages.appendChild(messageEl);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageEl;
+    }
+
+    // --- AI Vision Functions ---
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview-container').style.display = 'block';
+                // Store base64 string without the data URL prefix
+                uploadedImageBase64 = e.target.result.split(',')[1];
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function handleAiVisionRequest() {
+        const prompt = document.getElementById('ai-vision-prompt').value.trim();
+        const outputDiv = document.getElementById('ai-vision-output');
+
+        if (!uploadedImageBase64) {
+            outputDiv.textContent = "Please upload an image first.";
+            return;
+        }
+        if (!prompt) {
+            outputDiv.textContent = "Please ask a question about the image.";
+            return;
+        }
+
+        outputDiv.textContent = "Analyzing image with AI Vision... This may take a moment.";
+
+        const response = await callGemini(prompt, uploadedImageBase64);
+        outputDiv.textContent = response;
+    }
+
+
+
+/* -------- Cordova / Device Notification Scheduling (paste into Cordova app) -------- */
+// (Remaining Cordova code is unchanged)
+function scheduleCordovaNotifications() {
+    if (!window.cordova || !cordova.plugins || !cordova.plugins.notification || !cordova.plugins.notification.local) { console.log('[CordovaNotify] Cordova local notification plugin not available.'); return; }
+    cordova.plugins.notification.local.hasPermission(function(granted) { if (!granted) { cordova.plugins.notification.local.requestPermission(function(granted2) { if (!granted2) { console.warn('[CordovaNotify] Permission denied for local notifications.'); return; } setupCordovaSchedules(); }); } else { setupCordovaSchedules(); } });
+    function setupCordovaSchedules() {
+        cordova.plugins.notification.local.cancelAll(function() {
+            console.log('[CordovaNotify] Cleared existing notifications. Scheduling now...');
+            const dayMap = { sunday: 1, monday: 2, tuesday: 3, wednesday: 4, thursday: 5, friday: 6, saturday: 7 };
+            let idCounter = 2000;
+            Object.keys(timeTableData).forEach(function(day) {
+                const classes = timeTableData[day] || [];
+                classes.forEach(function(cls, idx) {
+                    try {
+                        const timeStr = cls.time.split(' - ')[0].trim(); const parts = timeStr.split(':').map(p => parseInt(p, 10)); const hour = parts[0]; const minute = parts[1] || 0; const id = idCounter++;
+                        cordova.plugins.notification.local.schedule({ id: id, title: 'Class: ' + cls.subject, text: 'Time: ' + cls.time + ' | Room: ' + (cls.room || ''), foreground: true, smallIcon: 'res://ic_stat_notify', trigger: { every: { weekday: dayMap[day], hour: hour, minute: minute } }, data: { subject: cls.subject, room: cls.room } });
+                        console.log('[CordovaNotify] Scheduled (weekday) ->', cls.subject, day, hour + ':' + (minute<10?('0'+minute):minute));
+                    } catch (e) {
+                        try {
+                            const next = getNextOccurrence(dayMap[day], hour, minute); const id2 = idCounter++;
+                            cordova.plugins.notification.local.schedule({ id: id2, title: 'Class: ' + cls.subject, text: 'Time: ' + cls.time + ' | Room: ' + (cls.room || ''), foreground: true, smallIcon: 'res://ic_stat_notify', trigger: { at: next, every: 'week' }, data: { subject: cls.subject, room: cls.room } });
+                            console.log('[CordovaNotify] Scheduled (fallback weekly) ->', cls.subject, next.toString());
+                        } catch (e2) { console.error('[CordovaNotify] Failed to schedule notification for', cls, e2); }
+                    }
+                });
+            });
+            cordova.plugins.notification.local.on('trigger', function(notification) { console.log('[CordovaNotify] Triggered:', notification.id, notification.title, notification.data); });
+        });
+    }
+    function getNextOccurrence(pluginWeekday, hour, minute) {
+        const now = new Date(); const targetJsDay = (pluginWeekday - 1) % 7; let candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0); let daysToAdd = (targetJsDay - now.getDay() + 7) % 7; if (daysToAdd === 0 && candidate <= now) daysToAdd = 7; candidate.setDate(candidate.getDate() + daysToAdd); return candidate;
+    }
+}
+document.addEventListener('deviceready', function() { console.log('[CordovaNotify] deviceready detected - scheduling Cordova notifications.'); scheduleCordovaNotifications(); }, false);
+
+
+</script>
+</body>
+</html>
+
