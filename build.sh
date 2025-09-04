@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 #
-# FINAL BUILD SCRIPT v5: Correct approach for Render's container environment without sudo.
+# FINAL BUILD SCRIPT v6: WeasyPrint ka istemal kar rahe hain, isliye apt-get ki ab zaroorat nahi.
 #
 
-# Step 1: Fix potential Windows line ending issues in requirements.txt
+# Step 1: requirements.txt file ko Linux format mein convert karna
 sed -i 's/\r$//' requirements.txt
 
-# Step 2: Install Python packages
+# Step 2: Zaroori Python packages install karna
 pip install -r requirements.txt
 
-# Step 3: Install system dependencies for wkhtmltopdf using standard apt-get
-# Is environment mein sudo command nahi hai, aur iski zaroorat bhi nahi hai.
-apt-get update
-apt-get install -y libxrender1 libfontconfig1 libxext6 wkhtmltopdf
+echo "Build script safaltapoorvak poora hua. Koi system package install nahi kiya gaya."
 
