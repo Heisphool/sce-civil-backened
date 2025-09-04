@@ -90,7 +90,3 @@ def download_result():
 def home():
     return "Result PDF Downloader server chal raha hai."
 
-# Yeh lines Render.com par zaroori nahi hain
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=5000)
-
