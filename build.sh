@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 #
-# FINAL BUILD SCRIPT v4: Adds 'sudo' for admin permissions to fix file system errors.
+# FINAL BUILD SCRIPT v5: Correct approach for Render's container environment without sudo.
 #
 
-# Step 1: requirements.txt file ko Linux format mein convert karna
+# Step 1: Fix potential Windows line ending issues in requirements.txt
 sed -i 's/\r$//' requirements.txt
 
-# Step 2: Zaroori Python packages install karna
+# Step 2: Install Python packages
 pip install -r requirements.txt
 
-# Step 3: Apt-get ki directory ko sudo (admin) permission se theek karna
-sudo rm -rf /var/lib/apt/lists/*
-sudo mkdir -p /var/lib/apt/lists/partial
-
-# Step 4: PDF banane waale tools ko sudo (admin) permission se install karna
-sudo apt-get update && sudo apt-get install -y --no-install-recommends \
-    libxrender1 \
-    libfontconfig1 \
-    libxext6 \
-    wkhtmltopdf
+# Step 3: Install system dependencies for wkhtmltopdf using standard apt-get
+# Is environment mein sudo command nahi hai, aur iski zaroorat bhi nahi hai.
+apt-get update
+apt-get install -y libxrender1 libfontconfig1 libxext6 wkhtmltopdf
 
