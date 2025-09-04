@@ -1,49 +1,48 @@
 import requests
 from bs4 import BeautifulSoup
-import pdfkit
-import os
-from urllib.parse import urlparse
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import io
+from io import BytesIO
+from weasyprint import HTML  # pdfkit ke badle WeasyPrint ko import kiya
 
-# --- Python Script ka original logic yahan hai ---
+app = Flask(__name__)
+CORS(app)
 
-# wkhtmltopdf ka configuration
-# Render par yeh build.sh se install ho jayega, isliye config ki zaroorat nahi
-config = None
-
-# Semester URLs
+# University Result URLs
 SEMESTER_URLS = {
-    1: "https://results.beup.ac.in/BTech1stSem2023_B2023Results.aspx",
-    2: "https://results.beup.ac.in/BTech2ndSem2024_B2023Results.aspx",
-    3: "https://results.beup.ac.in/BTech3rdSem2025_B2023Results.aspx"
+    "1": "https://results.beup.ac.in/BTech1stSem2023_B2023Results.aspx",
+    "2": "https://results.beup.ac.in/BTech2ndSem2024_B2023Results.aspx",
+    "3": "https://results.beup.ac.in/BTech3rdSem2025_B2023Results.aspx"
 }
 
-def get_result_pdf_in_memory(reg_no: str, semester: int):
+def fetch_result_and_save_pdf(reg_no: str, semester: str):
     """
-    Result fetch karke PDF banata hai aur use file ki tarah save karne ke bajaye memory me rakhta hai.
+    Result fetch karta hai aur WeasyPrint ka istemal karke PDF banata hai.
     """
     if semester not in SEMESTER_URLS:
-        raise ValueError(f"Galat semester number '{semester}'.")
+        raise ValueError("Galat semester number. Sirf 1, 2, ya 3 valid hai.")
 
     url = SEMESTER_URLS[semester]
+    base_url = "https://results.beup.ac.in/"
     
     session = requests.Session()
-    resp = session.get(url, timeout=20)
+    
+    # Step 1: Page load karo
+    resp = session.get(url, timeout=30)
     resp.raise_for_status()
-
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    # Hidden fields nikalna
     viewstate = soup.find("input", {"id": "__VIEWSTATE"})
     viewstategenerator = soup.find("input", {"id": "__VIEWSTATEGENERATOR"})
     eventvalidation = soup.find("input", {"id": "__EVENTVALIDATION"})
 
     if not all([viewstate, viewstategenerator, eventvalidation]):
-        raise RuntimeError("Page se zaroori form data nahi mila.")
+        raise RuntimeError("Result page se zaroori form fields nahi mile.")
 
     payload = {
-        "__EVENTTARGET": "", "__EVENTARGUMENT": "",
+        "__EVENTTARGET": "",
+        "__EVENTARGUMENT": "",
         "__VIEWSTATE": viewstate["value"],
         "__VIEWSTATEGENERATOR": viewstategenerator["value"],
         "__EVENTVALIDATION": eventvalidation["value"],
@@ -51,33 +50,17 @@ def get_result_pdf_in_memory(reg_no: str, semester: int):
         "ctl00$ContentPlaceHolder1$Button_Show": "Show Result"
     }
 
-    result_page = session.post(url, data=payload, timeout=20)
+    # Step 2: POST request bhejna
+    result_page = session.post(url, data=payload, timeout=30)
     result_page.raise_for_status()
+    result_html_string = result_page.text
 
-    if "Registration No. not found" in result_page.text or "Invalid Roll No." in result_page.text:
-        raise ValueError(f"Registration number '{reg_no}' nahi mila.")
-
-    parsed_url = urlparse(url)
-    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    soup_result = BeautifulSoup(result_page.text, 'html.parser')
-    if soup_result.head:
-        base_tag = soup_result.new_tag('base', href=f'{base_url}/')
-        soup_result.head.insert(0, base_tag)
-    
-    modified_html_string = str(soup_result)
-    
-    pdfkit_options = {"enable-local-file-access": None}
-    pdf_bytes = pdfkit.from_string(modified_html_string, False, configuration=config, options=pdfkit_options)
+    # Step 3: PDF banana (WeasyPrint ke saath)
+    # Humein CSS/Images ke liye base URL batana hota hai
+    html_doc = HTML(string=result_html_string, base_url=base_url)
+    pdf_bytes = html_doc.write_pdf()
     
     return pdf_bytes
-
-# --- Flask Server ka Code ---
-app = Flask(__name__)
-CORS(app)
-
-@app.route('/')
-def home():
-    return "Backend server for SCE Civil Hub is running."
 
 @app.route('/download-result', methods=['POST'])
 def download_result():
@@ -88,21 +71,26 @@ def download_result():
     if not reg_no or not semester:
         return jsonify({"error": "Registration number aur semester zaroori hai."}), 400
 
-    print(f"Request aayi: Reg No: {reg_no}, Semester: {semester}")
-
     try:
-        pdf_data = get_result_pdf_in_memory(reg_no, int(semester))
+        pdf_content = fetch_result_and_save_pdf(reg_no, str(semester))
         
+        # PDF ko browser mein download ke liye bhejna
         return send_file(
-            io.BytesIO(pdf_data),
+            BytesIO(pdf_content),
             mimetype='application/pdf',
             as_attachment=True,
             download_name=f'BEUP_Result_Sem{semester}_{reg_no}.pdf'
         )
 
     except Exception as e:
-        print(f"Error aayi: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error aayi hai: {e}")
+        return jsonify({"error": f"Result download nahi kar paaye. Error: {str(e)}"}), 500
 
-# Server chalane ke liye __main__ block ki zaroorat nahi, Render gunicorn ka use karega.
+@app.route('/')
+def home():
+    return "Result PDF Downloader server chal raha hai."
+
+# Yeh lines Render.com par zaroori nahi hain
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', port=5000)
 
