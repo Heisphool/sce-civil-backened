@@ -8,17 +8,16 @@ from weasyprint import HTML
 app = Flask(__name__)
 CORS(app)
 
-# Semester ke URLs
+# Semester URLs
 SEMESTER_URLS = {
     "1": "https://results.beup.ac.in/BTech1stSem2023_B2023Results.aspx",
     "2": "https://results.beup.ac.in/BTech2ndSem2024_B2023Results.aspx",
     "3": "https://results.beup.ac.in/BTech3rdSem2025_B2023Results.aspx"
 }
 
-
 def fetch_result_and_save_pdf(reg_no: str, semester: str):
     """
-    BEUP result fetch karta hai aur WeasyPrint ke saath PDF banata hai.
+    Result fetch karta hai aur WeasyPrint (v57.2 stable) se PDF banata hai.
     """
     if semester not in SEMESTER_URLS:
         raise ValueError("Galat semester number. Sirf 1, 2, ya 3 valid hai.")
@@ -34,16 +33,13 @@ def fetch_result_and_save_pdf(reg_no: str, semester: str):
     soup = BeautifulSoup(resp.text, "html.parser")
     print("STEP 1: Page fetch ho gaya ✅")
 
-    # Form fields dhoondhna
     viewstate = soup.find("input", {"id": "__VIEWSTATE"})
     viewstategenerator = soup.find("input", {"id": "__VIEWSTATEGENERATOR"})
     eventvalidation = soup.find("input", {"id": "__EVENTVALIDATION"})
 
     if not all([viewstate, viewstategenerator, eventvalidation]):
-        print("ERROR: Zaroori form fields nahi mile ❌")
-        raise RuntimeError("Result page ka structure badal gaya hai.")
+        raise RuntimeError("Result page ka structure badal gaya hai ❌")
 
-    # Form submit karne ka payload
     payload = {
         "__EVENTTARGET": "",
         "__EVENTARGUMENT": "",
@@ -60,15 +56,13 @@ def fetch_result_and_save_pdf(reg_no: str, semester: str):
     result_html_string = result_page.text
     print("STEP 2: Result page aa gaya ✅")
 
-    print("STEP 3: WeasyPrint se PDF bana raha hai...")
-    # Naye version ka syntax: HTML(string).write_pdf(BytesIO)
+    print("STEP 3: WeasyPrint (v57.2) se PDF bana raha hai...")
     pdf_io = BytesIO()
     HTML(string=result_html_string, base_url=base_url).write_pdf(pdf_io)
     pdf_io.seek(0)
-    print("STEP 3: PDF ready ho gayi ✅")
+    print("STEP 3: PDF ready ✅")
 
     return pdf_io
-
 
 @app.route('/download-result', methods=['POST'])
 def download_result():
@@ -80,22 +74,17 @@ def download_result():
         return jsonify({"error": "Registration number aur semester zaroori hai."}), 400
 
     try:
-        pdf_file = fetch_result_and_save_pdf(reg_no, str(semester))
+        pdf_io = fetch_result_and_save_pdf(reg_no, str(semester))
         return send_file(
-            pdf_file,
+            pdf_io,
             mimetype='application/pdf',
             as_attachment=True,
             download_name=f'BEUP_Result_Sem{semester}_{reg_no}.pdf'
         )
     except Exception as e:
         print(f"SERVER ERROR: {e}")
-        return jsonify({"error": f"Result download nahi ho paya. Error: {str(e)}"}), 500
-
+        return jsonify({"error": f"Result download nahi kar paaye. Server error: {str(e)}"}), 500
 
 @app.route('/')
 def home():
-    return "⚡ Result PDF Downloader server (v3 - Debug mode, WeasyPrint 60.2) chal raha hai."
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return "⚡ Result PDF Downloader server (v3 - Stable WeasyPrint 57.2) chal raha hai."
